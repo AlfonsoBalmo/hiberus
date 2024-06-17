@@ -80,6 +80,7 @@ jobs:
 
       - name: Apply Kubernetes manifests
         run: |
+          kubectl get ns
           kubectl apply -f manifest/deployment.yaml --validate=false
           kubectl apply -f manifest/service.yaml --validate=false
 
