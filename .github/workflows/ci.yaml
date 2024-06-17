@@ -83,8 +83,10 @@ jobs:
         uses: kodermax/kubectl-aws-eks@main
 
       - name: Create kubeconfig file
+        env:
+          CLUSTER_NAME: ${{ secrets.CLUSTER_NAME }}
         run: |
-          aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region us-east-1
+          aws eks update-kubeconfig --name $CLUSTER_NAME --region us-east-1
 
       - name: Apply Kubernetes manifests
         run: |
