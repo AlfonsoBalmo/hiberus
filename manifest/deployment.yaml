@@ -20,6 +20,24 @@ spec:
         ports:
         - containerPort: 3000
         env:
-        - name: NODE_ENV
-          value: "production"
+        - name: MYSQLDB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: myapp-secrets
+              key: MYSQLDB_HOST
+        - name: MYSQLDB_USER
+          valueFrom:
+            secretKeyRef:
+              name: myapp-secrets
+              key: MYSQLDB_USER
+        - name: MYSQLDB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: myapp-secrets
+              key: MYSQLDB_PASSWORD
+        - name: MYSQLDB_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: myapp-secrets
+              key: MYSQLDB_DATABASE
 
