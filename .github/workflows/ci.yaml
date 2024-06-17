@@ -84,9 +84,11 @@ jobs:
 
       - name: Create kubeconfig file
         run: |
-          aws eks update-kubeconfig --name ${{ vars.CLUSTER_NAME }} --region us-east-1 --kubeconfig $KUBECONFIG
+          aws eks update-kubeconfig --name ${{ vars.CLUSTER_NAME }} --region us-east-1 --kubeconfig
 
       - name: Apply Kubernetes manifests
+        env:
+          KUBECONFIG: /home/runner/.kube/config
         run: |
           kubectl apply -f manifest/deployment.yaml
           kubectl apply -f manifest/service.yaml
