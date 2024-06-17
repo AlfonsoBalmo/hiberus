@@ -58,7 +58,8 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          tags: alfonsobalmori/myapp:${{ env.GIT_SHA }}
+          push: true
+          tags: alfonsobalmori/myapp:${{ github.sha }}
 
       - name: Update deployment.yaml with new Docker image tag
         run: |
