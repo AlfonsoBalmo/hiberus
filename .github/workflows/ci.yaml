@@ -84,36 +84,17 @@ jobs:
         with:
           version: 'latest'
 
-      - name: Get EKS Cluster Token
-        id: eks-token
-        run: echo "KUBE_TOKEN=$(aws eks get-token --cluster-name your-cluster-name --query 'status.token' --output text)" >> $GITHUB_ENV
-
-      - name: Create kubeconfig file
-        run: |
-          mkdir -p $HOME/.kube
-          echo "
-          apiVersion: v1
-          clusters:
-          - cluster:
-              server: <EKS_CLUSTER_ENDPOINT>
-              certificate-authority-data: <EKS_CLUSTER_CERTIFICATE>
-            name: eks-cluster
-          contexts:
-          - context:
-              cluster: eks-cluster
-              user: aws
-            name: eks-context
-          current-context: eks-context
-          kind: Config
-          preferences: {}
-          users:
-          - name: aws
-            user:
-              token: ${{ env.KUBE_TOKEN }}
-          " > $HOME/.kube/config
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
 
       - name: Apply Kubernetes manifests
-        run: kubectl apply -f manifest/
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+        run: |
+          kubectl apply -f manifest/deployment.yaml
+          kubectl apply -f manifest/service.yaml
 
       - name: Bypass Husky
         run: git config core.hooksPath /dev/null
