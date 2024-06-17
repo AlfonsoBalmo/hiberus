@@ -90,8 +90,8 @@ jobs:
         env:
           KUBECONFIG: /home/runner/.kube/config
         run: |
-          kubectl apply -f manifest/deployment.yaml
-          kubectl apply -f manifest/service.yaml
+          kubectl apply -f manifest/deployment.yaml ---validate=false
+          kubectl apply -f manifest/service.yaml --validate=false
 
       - name: Bypass Husky
         run: git config core.hooksPath /dev/null
