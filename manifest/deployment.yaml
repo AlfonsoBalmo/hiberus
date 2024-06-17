@@ -40,4 +40,6 @@ spec:
             secretKeyRef:
               name: myapp-secrets
               key: MYSQLDB_DATABASE
+        imagePullSecrets:
+        - name: dockerhub-secret
 
