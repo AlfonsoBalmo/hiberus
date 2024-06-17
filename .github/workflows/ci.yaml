@@ -56,29 +56,58 @@ jobs:
         id: vars
         run: echo "GIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-      - name: Build Docker image
+      - name: Build and Push Docker image
         run: |
-          docker build -t amurillog/myapp:${{ env.GIT_SHA }} .
+          docker build -t alfonsobalmori/myapp:${{ env.GIT_SHA }} .
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          docker push amurillog/myapp:${{ env.GIT_SHA }}
+          docker push alfonsobalmori/myapp:${{ env.GIT_SHA }}
 
       - name: Update deployment.yaml with new Docker image tag
         run: |
           sed -i 's/tag: ".*"/tag: "${{ env.GIT_SHA }}"/' manifest/deployment.yaml
 
-      - name: Configure kubectl
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Setup kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'latest'
 
-      - name: Apply Kubernetes manifests
-        uses: manusa/actions-setup-kubectl@v2
-        with:
-          version: 'latest'
+      - name: Get EKS Cluster Token
+        id: eks-token
+        run: echo "KUBE_TOKEN=$(aws eks get-token --cluster-name your-cluster-name --query 'status.token' --output text)" >> $GITHUB_ENV
+
+      - name: Create kubeconfig file
         run: |
-          kubectl apply -f manifest/
-        env:
-          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+          mkdir -p $HOME/.kube
+          echo "
+          apiVersion: v1
+          clusters:
+          - cluster:
+              server: <EKS_CLUSTER_ENDPOINT>
+              certificate-authority-data: <EKS_CLUSTER_CERTIFICATE>
+            name: eks-cluster
+          contexts:
+          - context:
+              cluster: eks-cluster
+              user: aws
+            name: eks-context
+          current-context: eks-context
+          kind: Config
+          preferences: {}
+          users:
+          - name: aws
+            user:
+              token: ${{ env.KUBE_TOKEN }}
+          " > $HOME/.kube/config
+
+      - name: Apply Kubernetes manifests
+        run: kubectl apply -f manifest/
 
       - name: Bypass Husky
         run: git config core.hooksPath /dev/null
@@ -92,4 +121,3 @@ jobs:
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
