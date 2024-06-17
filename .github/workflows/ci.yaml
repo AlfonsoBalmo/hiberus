@@ -66,15 +66,12 @@ jobs:
         run: |
           sed -i 's/tag: ".*"/tag: "${{ env.GIT_SHA }}"/' manifest/deployment.yaml
 
-      - name: Configure kubectl
+      - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'latest'
 
       - name: Apply Kubernetes manifests
-        uses: manusa/actions-setup-kubectl@v2
-        with:
-          version: 'latest'
         run: |
           kubectl apply -f manifest/
         env:
@@ -92,4 +89,3 @@ jobs:
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
