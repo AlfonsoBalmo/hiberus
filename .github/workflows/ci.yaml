@@ -90,7 +90,7 @@ jobs:
         env:
           KUBECONFIG: /home/runner/.kube/config
         run: |
-          kubectl apply -f manifest/deployment.yaml ---validate=false
+          kubectl apply -f manifest/deployment.yaml --validate=false
           kubectl apply -f manifest/service.yaml --validate=false
 
       - name: Bypass Husky
