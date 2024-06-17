@@ -84,7 +84,7 @@ jobs:
 
       - name: Create kubeconfig file
         run: |
-          aws eks update-kubeconfig --name ${{ vars.CLUSTER_NAME }} --region us-east-1
+          aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region us-east-1 --kubeconfig $KUBECONFIG
 
       - name: Apply Kubernetes manifests
         env:
