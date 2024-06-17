@@ -62,7 +62,7 @@ jobs:
 
       - name: Update deployment.yaml with new Docker image tag
         run: |
-          sed -i 's/tag: ".*"/tag: "${{ env.GIT_SHA }}"/' manifest/deployment.yaml
+          sed -i 's|\(image: alfonsobalmori/myapp:\).*|\1${{ env.GIT_SHA }}|' manifest/deployment.yaml
 
       - name: Configure AWS credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v4
