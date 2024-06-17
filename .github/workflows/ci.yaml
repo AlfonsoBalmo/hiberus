@@ -59,7 +59,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: alfonsobalmori/myapp:${{ github.sha }}
+          tags: alfonsobalmori/myapp:${{ env.GIT_SHA }}
 
       - name: Update deployment.yaml with new Docker image tag
         run: |
@@ -93,7 +93,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add manifest/deployment.yaml
-          git commit -m "Update deployment.yaml with new image tag ${{ github.sha }} [skip ci]"
+          git commit -m "Update deployment.yaml with new image tag ${{ env.GIT_SHA }} [skip ci]"
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
